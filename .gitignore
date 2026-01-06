@@ -1,0 +1,20 @@
+# Virtual environments
+llm_model/.venv/
+/.venv/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Environments and secrets
+.env
+llm_model/.env
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Jupyter
+*.ipynb_checkpoints
