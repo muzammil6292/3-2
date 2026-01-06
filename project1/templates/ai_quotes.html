@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Inspiring Quotes</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root{--bg1:#0f172a;--bg2:#0b1220;--card:#0b1020;--accent:#7c3aed;--muted:rgba(255,255,255,0.7)}
+    *{box-sizing:border-box;font-family:Inter,system-ui,Segoe UI,Roboto,'Helvetica Neue',Arial}
+    html,body{height:100%;margin:0}
+    body{display:flex;align-items:center;justify-content:center;padding:32px;background:linear-gradient(135deg,var(--bg1),var(--bg2));color:#fff}
+    .wrap{max-width:760px;width:100%}
+    .card{background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));border-radius:16px;padding:32px;backdrop-filter:blur(6px);box-shadow:0 10px 30px rgba(2,6,23,0.6);}
+    .quote{font-size:1.6rem;line-height:1.45;margin:0 0 18px;opacity:0;transform:translateY(8px);transition:all .35s cubic-bezier(.2,.9,.3,1)}
+    .quote.show{opacity:1;transform:none}
+    .author{font-weight:600;color:var(--muted);margin-bottom:18px}
+    .meta{display:flex;gap:12px;align-items:center}
+    .btn{background:transparent;border:1px solid rgba(255,255,255,0.08);padding:10px 14px;border-radius:10px;color:#fff;cursor:pointer;font-weight:600}
+    .btn.primary{background:linear-gradient(90deg,var(--accent),#4f46e5);border:0}
+    .controls{display:flex;gap:10px;justify-content:flex-end}
+    .brand{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+    .logo{width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,#111827,#0b1220);display:flex;align-items:center;justify-content:center;color:var(--accent);font-weight:700}
+    .small{font-size:0.9rem;color:var(--muted)}
+    .actions{display:flex;gap:8px}
+    @media (max-width:520px){.quote{font-size:1.25rem}.controls{justify-content:space-between}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <div class="brand">
+        <div class="logo">Q</div>
+        <div>
+          <div style="font-weight:700">Inspiring Quotes</div>
+          <div class="small">Fresh, shareable quotes — powered by quotable.io</div>
+        </div>
+      </div>
+
+      <blockquote id="quote" class="quote">Loading inspiring quote…</blockquote>
+      <div id="author" class="author"></div>
+
+      <div class="meta">
+        <div class="small">Tap <strong>New Quote</strong> for another</div>
+        <div style="flex:1"></div>
+        <div class="controls">
+          <div class="actions">
+            <button id="copyBtn" class="btn" title="Copy quote">Copy</button>
+            <a id="tweetBtn" class="btn" target="_blank" rel="noopener" title="Tweet quote">Tweet</a>
+            <button id="newBtn" class="btn primary">New Quote</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const quoteEl = document.getElementById('quote')
+    const authorEl = document.getElementById('author')
+    const newBtn = document.getElementById('newBtn')
+    const copyBtn = document.getElementById('copyBtn')
+    const tweetBtn = document.getElementById('tweetBtn')
+
+    async function loadQuote(){
+      // show loading state
+      quoteEl.classList.remove('show')
+      quoteEl.textContent = 'Loading inspiring quote…'
+      authorEl.textContent = ''
+      try{
+        const res = await fetch('/api/quote')
+        const data = await res.json()
+        const text = data.content || 'Stay curious.'
+        const author = data.author || 'Unknown'
+        // apply
+        quoteEl.textContent = '“' + text + '”'
+        authorEl.textContent = '— ' + author
+        // animate
+        requestAnimationFrame(()=> quoteEl.classList.add('show'))
+        // update tweet link
+        const tweet = encodeURIComponent(`${text} — ${author}`)
+        tweetBtn.href = `https://twitter.com/intent/tweet?text=${tweet}`
+      }catch(err){
+        quoteEl.textContent = 'Unable to load quote — try again.'
+        authorEl.textContent = ''
+        quoteEl.classList.add('show')
+      }
+    }
+
+    newBtn.addEventListener('click', loadQuote)
+    copyBtn.addEventListener('click', async ()=>{
+      const txt = quoteEl.textContent + ' ' + authorEl.textContent
+      try{await navigator.clipboard.writeText(txt); copyBtn.textContent='Copied'; setTimeout(()=>copyBtn.textContent='Copy',1200)}catch(e){copyBtn.textContent='Copy'}
+    })
+
+    // initial
+    loadQuote()
+  </script>
+</body>
+</html>
