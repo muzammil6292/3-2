@@ -1,6 +1,3 @@
-from dotenv import load_dotenv
-load_dotenv()
-
 import streamlit as st
 from utils.parallel import run_parallel, generate_report
 from datetime import datetime
